@@ -1,0 +1,36 @@
+pandas
+streamlit
+google-search-results
+requests
+
+
+
+------------
+
+
+2. Roteiro de Apresentação (Pitch de MBA)
+Este roteiro foi pensado para destacar sua maturidade técnica e visão de negócios.
+
+Introdução (O Problema)
+"O objetivo do projeto é resolver a fragmentação de informações sobre eventos culturais em Recife."
+
+"Enfrentamos um desafio real: a instabilidade das APIs governamentais, o que nos levou a arquitetar uma solução resiliente usando agregadores globais."
+
+A Solução Técnica (O "Como")
+Extração Inteligente: "Desenvolvi um extrator em Python que consome a API do Google Events (SerpApi). Ele não apenas busca os dados, mas aplica uma lógica de limpeza."
+
+Deduplicação (O Diferencial): "Para evitar poluição visual e redundância no banco de dados, implementei uma lógica de Drop Duplicates. O sistema compara o que já existe no CSV com os novos dados, garantindo que eventos repetidos sejam descartados antes da persistência."
+
+Frontend Reativo: "Utilizei Streamlit para criar uma interface Web moderna, onde os dados são filtrados e apresentados de forma intuitiva para o usuário, incluindo links diretos para compra de ingressos."
+
+Arquitetura (Visão Geral)
+Fonte: Google Events API (Dados Reais).
+
+Processamento: Python + Pandas (Limpeza e Deduplicação).
+
+Armazenamento: Arquivo CSV (Persistência leve e portátil).
+
+Interface: Streamlit (Visualização).
+
+Conclusão (Escalabilidade)
+"A solução é agnóstica à cidade. Basta mudar o parâmetro de busca para que o sistema funcione em qualquer lugar do mundo, mantendo a mesma integridade de dados."

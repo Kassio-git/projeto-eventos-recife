@@ -1,53 +1,51 @@
 import streamlit as st
 import pandas as pd
-from datetime import datetime, timedelta
 
 # Configuração da página
-st.set_page_config(page_title="Agenda Cultural Recife", layout="centered")
+st.set_page_config(page_title="Agenda Cultural Recife", layout="centered", page_icon="📍")
 
 st.title("📍 Eventos Culturais - Recife")
-st.markdown("Protótipo de busca de eventos para o próximo mês.")
+st.markdown("Protótipo de busca de eventos reais extraídos via API.")
 
 # 1. Função para carregar os dados
 def carregar_dados():
     try:
         df = pd.read_csv("banco_eventos.csv")
-        # Converte a coluna de data para o formato de data do Python
-        df['data'] = pd.to_datetime(df['data'])
         return df
     except FileNotFoundError:
-        st.error("O banco de dados ainda não foi criado. Rode o extrator primeiro!")
         return pd.DataFrame()
 
-# 2. Filtragem de Datas (Regra de Negócio)
+# 2. Processamento dos Dados
 df = carregar_dados()
 
 if not df.empty:
-    hoje = datetime.now()
-    mes_que_vem = hoje + timedelta(days=30)
-
-    # Filtrar eventos entre hoje e daqui a 30 dias
-    eventos_filtrados = df[(df['data'] >= hoje) & (df['data'] <= mes_que_vem)]
-    eventos_filtrados = eventos_filtrados.sort_values(by='data')
-
-    # Interface
-    st.subheader(f"Exibindo eventos até {mes_que_vem.strftime('%d/%m/%Y')}")
+    st.subheader("Eventos Encontrados em Recife")
     
-    if eventos_filtrados.empty:
-        st.info("Nenhum evento encontrado para os próximos 30 dias.")
-    else:
-        for index, row in eventos_filtrados.iterrows():
-            with st.container():
-                col1, col2 = st.columns([1, 4])
-                with col1:
-                    st.metric("Data", row['data'].strftime('%d/%b'))
-                with col2:
-                    st.write(f"### {row['nome']}")
-                    st.caption(f"📍 Local: {row['local']}")
-                st.divider()
+    for index, row in df.iterrows():
+        # Lógica para evitar o KeyError: tenta pegar 'data_texto', se não existir tenta 'data'
+        data_exibicao = row.get('data_texto') or row.get('data') or "Data a confirmar"
+        nome_evento = row.get('nome', 'Evento sem nome')
+        local_evento = row.get('local', 'Local não informado')
+        link_evento = row.get('link')
 
-# Rodapé lateral para o seu projeto
-st.sidebar.header("Configurações do Extrator")
-if st.sidebar.button("Rodar Extrator Agora"):
-    # Aqui você poderia chamar a função do seu extrator_mock.py
-    st.sidebar.success("Dados atualizados com sucesso!")
+        with st.container():
+            col1, col2 = st.columns([1, 4])
+            
+            with col1:
+                st.markdown(f"🗓️ **{data_exibicao}**")
+            
+            with col2:
+                st.write(f"### {nome_evento}")
+                st.caption(f"📍 **Local:** {local_evento}")
+                
+                if pd.notna(link_evento):
+                    st.link_button("Ver Detalhes", link_evento)
+            
+            st.divider()
+else:
+    st.info("O banco de dados está vazio. Por favor, execute o extrator para buscar eventos.")
+
+# --- Barra Lateral ---
+st.sidebar.header("Painel de Controle")
+if st.sidebar.button("Executar Extração (API)"):
+    st.sidebar.info("Rode o comando 'python extrator_real.py' no terminal para atualizar os dados reais.")
